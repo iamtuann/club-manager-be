@@ -4,8 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum EStatus {
-    PRIVATE(0, "Inactive"),
-    PUBLIC(1, "Active");
+    INACTIVE(0, "Inactive"),
+    ACTIVE(1, "Active");
 
     private final Integer value;
     private final String title;
