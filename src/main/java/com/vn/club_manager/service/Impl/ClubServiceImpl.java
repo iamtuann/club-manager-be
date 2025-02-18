@@ -60,17 +60,16 @@ public class ClubServiceImpl implements ClubService {
     }
 
     @Override
-    public ClubDto setPresident(long id, Long userId) {
+    public void setPresident(long id, Long userId) {
         Club club = clubRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Club", "id", id));
         User user = authUserRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-        if (memberRepository.existsByClubIdAndMemberId(id, userId)) {
+        if (memberRepository.existsByClubIdAndUserId(id, userId)) {
             club.setManager(user);
         } else {
             throw new APIException(HttpStatus.BAD_REQUEST, "User is not a member of this Club");
         }
-        return null;
     }
 
     @Override

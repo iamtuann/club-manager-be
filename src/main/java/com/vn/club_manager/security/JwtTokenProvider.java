@@ -9,12 +9,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class JwtTokenProvider {
@@ -31,11 +33,15 @@ public class JwtTokenProvider {
         Date currentDate = new Date();
 
         Date expireDate = new Date(currentDate.getTime() + jwtExpire);
+        List<String> roles = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
 
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())
                 .expiration(expireDate)
+                .claim("roles", roles)
                 .signWith(key())
                 .compact();
     }

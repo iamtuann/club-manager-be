@@ -13,6 +13,8 @@ public interface ClubRepository extends JpaRepository<Club, Long> {
 
     Club findClubById(long id);
 
+    boolean existsByIdAndManagerId(long id, long managerId);
+
     @Query(value = "SELECT c FROM Club c " +
             "WHERE (:name IS NULL OR :name = '' OR (c.name LIKE CONCAT('%', :name, '%'))) " )
     Page<Club> searchClubs(@Param("name") String name,

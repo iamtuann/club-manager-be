@@ -77,7 +77,8 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(authorize -> authorize
 //                        .requestMatchers("api/users/topics", "api/users/folders").authenticated()
-                        .anyRequest().permitAll()
+                                .requestMatchers("api/auth/login").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);

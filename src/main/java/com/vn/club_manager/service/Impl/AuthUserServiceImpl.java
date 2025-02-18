@@ -9,6 +9,7 @@ import com.vn.club_manager.model.AuthUserResponse;
 import com.vn.club_manager.model.request.LoginRequest;
 import com.vn.club_manager.model.request.RegisterRequest;
 import com.vn.club_manager.repository.AuthUserRepository;
+import com.vn.club_manager.repository.ClubRepository;
 import com.vn.club_manager.repository.RoleRepository;
 import com.vn.club_manager.security.JwtTokenProvider;
 import com.vn.club_manager.security.UserDetailsImpl;
@@ -31,9 +32,25 @@ import java.util.Set;
 public class AuthUserServiceImpl implements AuthUserService {
     private final AuthUserRepository authUserRepository;
     private final RoleRepository roleRepository;
+    private final ClubRepository clubRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+
+    @Override
+    public boolean isManager(Long userId) {
+        return authUserRepository.isManager(userId);
+    }
+
+    @Override
+    public boolean isClubManager(Long userId, Long clubId) {
+        return clubRepository.existsByIdAndManagerId(userId, clubId);
+    }
+
+    @Override
+    public boolean hasClubManagementRights(Long userId, Long clubId) {
+        return isManager(userId) || isClubManager(userId, clubId);
+    }
 
     @Override
     public AuthUserResponse login(LoginRequest request) {

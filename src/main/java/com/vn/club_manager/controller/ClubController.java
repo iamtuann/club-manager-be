@@ -1,16 +1,23 @@
 package com.vn.club_manager.controller;
 
+import com.vn.club_manager.model.BoardDto;
 import com.vn.club_manager.model.ClubDto;
 import com.vn.club_manager.model.PageDto;
 import com.vn.club_manager.model.request.AddMemberRequest;
+import com.vn.club_manager.model.request.BoardRequest;
 import com.vn.club_manager.model.request.ClubRequest;
+import com.vn.club_manager.security.UserDetailsImpl;
+import com.vn.club_manager.service.BoardService;
 import com.vn.club_manager.service.ClubService;
 import com.vn.club_manager.service.MemberService;
 import com.vn.club_manager.utils.PageUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -19,6 +26,7 @@ public class ClubController {
 
     private final ClubService clubService;
     private final MemberService memberService;
+    private final BoardService boardService;
     private final PageUtil pageUtil;
 
     @GetMapping("")
@@ -60,7 +68,25 @@ public class ClubController {
 
     @PostMapping("{id}/set-president")
     private ResponseEntity<?> setPresident(@PathVariable Long id, @RequestBody Long userId) {
-
+        clubService.setPresident(id, userId);
         return ResponseEntity.ok("Set President successfully");
+    }
+
+    @GetMapping("{id}/boards")
+    private ResponseEntity<List<BoardDto>> getBoards(@PathVariable Long id) {
+        List<BoardDto> boards = boardService.findBoardsByClubId(id);
+        return ResponseEntity.ok(boards);
+    }
+
+    @PostMapping("{id}/boards")
+    private ResponseEntity<?> createBoard(@PathVariable Long id, @RequestBody BoardRequest request, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        boardService.create(id, request, userDetails.getId());
+        return ResponseEntity.ok("Create board successfully");
+    }
+
+    @DeleteMapping("{id}/boards/{boardId}")
+    private ResponseEntity<?> deleteBoard(@PathVariable Long id, @PathVariable Long boardId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        boardService.delete(id, boardId, userDetails.getId());
+        return ResponseEntity.ok("Delete board successfully");
     }
 }
