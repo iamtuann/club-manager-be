@@ -26,7 +26,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public void create(Long clubId, BoardRequest request, Long userId) {
         if (!authUserService.hasClubManagementRights(userId, clubId)) {
-            throw new NoPermissionException("delete this board");
+            throw new NoPermissionException("create board");
         }
         Club club = clubRepository.findById(clubId)
                 .orElseThrow(() -> new ResourceNotFoundException("Club", "id", clubId));

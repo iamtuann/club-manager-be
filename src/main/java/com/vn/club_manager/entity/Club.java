@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -38,6 +39,9 @@ public class Club {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User manager;
+
+    @OneToMany(mappedBy = "club", fetch = FetchType.LAZY)
+    private List<Member> members;
 
     @Column(name = "status")
     private Integer status;

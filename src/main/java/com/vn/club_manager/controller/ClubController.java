@@ -6,9 +6,11 @@ import com.vn.club_manager.model.PageDto;
 import com.vn.club_manager.model.request.AddMemberRequest;
 import com.vn.club_manager.model.request.BoardRequest;
 import com.vn.club_manager.model.request.ClubRequest;
+import com.vn.club_manager.model.request.EventRequest;
 import com.vn.club_manager.security.UserDetailsImpl;
 import com.vn.club_manager.service.BoardService;
 import com.vn.club_manager.service.ClubService;
+import com.vn.club_manager.service.EventService;
 import com.vn.club_manager.service.MemberService;
 import com.vn.club_manager.utils.PageUtil;
 import lombok.AllArgsConstructor;
@@ -27,6 +29,7 @@ public class ClubController {
     private final ClubService clubService;
     private final MemberService memberService;
     private final BoardService boardService;
+    private final EventService eventService;
     private final PageUtil pageUtil;
 
     @GetMapping("")
@@ -88,5 +91,23 @@ public class ClubController {
     private ResponseEntity<?> deleteBoard(@PathVariable Long id, @PathVariable Long boardId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         boardService.delete(id, boardId, userDetails.getId());
         return ResponseEntity.ok("Delete board successfully");
+    }
+
+    @PostMapping("{id}/events")
+    private ResponseEntity<?> createEvent(@PathVariable Long id, @RequestBody EventRequest request, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        eventService.create(id, request, userDetails.getId());
+        return ResponseEntity.ok("Create event successfully");
+    }
+
+    @PutMapping("{id}/events/{eventId}")
+    private ResponseEntity<?> createEvent(@PathVariable Long id, @PathVariable Long eventId, @RequestBody EventRequest request, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        eventService.update(eventId, id, request, userDetails.getId());
+        return ResponseEntity.ok("Update event successfully");
+    }
+
+    @DeleteMapping("{id}/boards/{eventId}")
+    private ResponseEntity<?> deleteEvent(@PathVariable Long id, @PathVariable Long eventId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        eventService.delete(eventId, id, userDetails.getId());
+        return ResponseEntity.ok("Delete event successfully");
     }
 }

@@ -19,6 +19,7 @@ public class ClubDto {
     private Date createdAt;
     private Date dissolvedAt;
     private UserDto manager;
+    private Integer memberCount;
     private Integer status;
 
     public ClubDto(Club club) {
@@ -28,6 +29,7 @@ public class ClubDto {
         this.createdAt = club.getCreatedAt();
         this.dissolvedAt = club.getDissolvedAt();
         this.status = club.getStatus();
+        this.memberCount = club.getMembers() != null ? club.getMembers().size() : 0;
         this.manager = club.getManager() != null ? new UserDto(club.getManager()) : null;
     }
 }
