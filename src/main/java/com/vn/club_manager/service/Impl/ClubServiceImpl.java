@@ -1,17 +1,21 @@
 package com.vn.club_manager.service.Impl;
 
 import com.vn.club_manager.entity.Club;
+import com.vn.club_manager.entity.User;
 import com.vn.club_manager.enums.EStatus;
+import com.vn.club_manager.exception.APIException;
 import com.vn.club_manager.exception.ResourceNotFoundException;
 import com.vn.club_manager.model.ClubDto;
 import com.vn.club_manager.model.PageDto;
 import com.vn.club_manager.model.request.ClubRequest;
 import com.vn.club_manager.repository.AuthUserRepository;
 import com.vn.club_manager.repository.ClubRepository;
+import com.vn.club_manager.repository.MemberRepository;
 import com.vn.club_manager.service.ClubService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +25,7 @@ import java.util.List;
 public class ClubServiceImpl implements ClubService {
     private final ClubRepository clubRepository;
     private final AuthUserRepository authUserRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public ClubDto findClubById(Long id) {
@@ -52,6 +57,20 @@ public class ClubServiceImpl implements ClubService {
         UpdateClubFromRequest(request, club);
         club = clubRepository.save(club);
         return new ClubDto(club);
+    }
+
+    @Override
+    public ClubDto setPresident(long id, Long userId) {
+        Club club = clubRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Club", "id", id));
+        User user = authUserRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        if (memberRepository.existsByClubIdAndMemberId(id, userId)) {
+            club.setManager(user);
+        } else {
+            throw new APIException(HttpStatus.BAD_REQUEST, "User is not a member of this Club");
+        }
+        return null;
     }
 
     @Override

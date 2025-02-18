@@ -2,8 +2,10 @@ package com.vn.club_manager.controller;
 
 import com.vn.club_manager.model.ClubDto;
 import com.vn.club_manager.model.PageDto;
+import com.vn.club_manager.model.request.AddMemberRequest;
 import com.vn.club_manager.model.request.ClubRequest;
 import com.vn.club_manager.service.ClubService;
+import com.vn.club_manager.service.MemberService;
 import com.vn.club_manager.utils.PageUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class ClubController {
 
     private final ClubService clubService;
+    private final MemberService memberService;
     private final PageUtil pageUtil;
 
     @GetMapping("")
@@ -47,5 +50,17 @@ public class ClubController {
     private ResponseEntity<ClubDto> updateClub(@PathVariable Long id, @RequestBody ClubRequest request) {
         ClubDto club = clubService.update(id, request);
         return ResponseEntity.ok(club);
+    }
+
+    @PostMapping("{id}/add-member")
+    private ResponseEntity<?> addMember(@PathVariable Long id, @RequestBody AddMemberRequest request) {
+        memberService.AddMember(id, request);
+        return ResponseEntity.ok("Add member successfully");
+    }
+
+    @PostMapping("{id}/set-president")
+    private ResponseEntity<?> setPresident(@PathVariable Long id, @RequestBody Long userId) {
+
+        return ResponseEntity.ok("Set President successfully");
     }
 }

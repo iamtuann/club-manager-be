@@ -17,4 +17,6 @@ public interface ClubRepository extends JpaRepository<Club, Long> {
             "WHERE (:name IS NULL OR :name = '' OR (c.name LIKE CONCAT('%', :name, '%'))) " )
     Page<Club> searchClubs(@Param("name") String name,
                              Pageable pageable);
+
+    Long id(Long id);
 }

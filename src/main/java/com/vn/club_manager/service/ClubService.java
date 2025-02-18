@@ -15,5 +15,7 @@ public interface ClubService {
 
     ClubDto update(long id, ClubRequest request);
 
+    ClubDto setPresident(long id, Long userId);
+
     void delete(long id, long userId);
 }
