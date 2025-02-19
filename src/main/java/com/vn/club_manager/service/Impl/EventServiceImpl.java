@@ -3,6 +3,7 @@ package com.vn.club_manager.service.Impl;
 import com.vn.club_manager.entity.Club;
 import com.vn.club_manager.entity.Event;
 import com.vn.club_manager.entity.Member;
+import com.vn.club_manager.entity.User;
 import com.vn.club_manager.exception.NoPermissionException;
 import com.vn.club_manager.exception.ResourceNotFoundException;
 import com.vn.club_manager.model.EventDto;
@@ -14,6 +15,7 @@ import com.vn.club_manager.repository.MemberRepository;
 import com.vn.club_manager.service.AuthUserService;
 import com.vn.club_manager.service.EventService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -29,27 +31,36 @@ public class EventServiceImpl implements EventService {
     private final MemberRepository memberRepository;
 
     @Override
-    public PageDto<EventDto> searchEvents(String name, Long clubId, Pageable pageable) {
+    public PageDto<EventDto> searchEventsClub(String name, Long clubId, Pageable pageable) {
+        Page<Event> pages = eventRepository.searchEventClub(name, clubId, pageable);
+        List<EventDto> events = pages.stream().map(EventDto::new).toList();
+        return new PageDto<>(events, pages);
+    }
 
-        return null;
+    @Override
+    public EventDto getEventById(Long id, Long userId) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Event", "id", id));
+        return new EventDto(event);
     }
 
     @Override
     public void create(Long clubId, EventRequest request, Long userId) {
-        if (!authUserService.isClubManager(userId, clubId)) {
+        if (!authUserService.hasClubManagementRights(userId, clubId)) {
             throw new NoPermissionException("create event");
         }
         Club club = clubRepository.findById(clubId)
                 .orElseThrow(() -> new ResourceNotFoundException("Club", "id", clubId));
         Event event = new Event();
+        event.setClub(club);
         updateEventFromRequest(request, event, clubId);
         eventRepository.save(event);
     }
 
     @Override
     public void update(Long eventId, Long clubId, EventRequest request, Long userId) {
-        if (!authUserService.isClubManager(userId, clubId)) {
-            throw new NoPermissionException("create event");
+        if (!authUserService.hasClubManagementRights(userId, clubId)) {
+            throw new NoPermissionException("update event");
         }
         Event event = eventRepository.findByIdAndClubId(eventId, clubId)
                 .orElseThrow(() -> new ResourceNotFoundException("Event", "id", eventId));
@@ -59,8 +70,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void delete(Long eventId, Long clubId, Long userId) {
-        if (!authUserService.isClubManager(userId, clubId)) {
-            throw new NoPermissionException("create event");
+        if (!authUserService.hasClubManagementRights(userId, clubId)) {
+            throw new NoPermissionException("delete event");
         }
         Event event = eventRepository.findByIdAndClubId(eventId, clubId)
                 .orElseThrow(() -> new ResourceNotFoundException("Event", "id", eventId));
@@ -84,14 +95,14 @@ public class EventServiceImpl implements EventService {
             event.setAddress(request.getAddress());
         }
         if (request.getUserIds() != null) {
-            List<Member> members = new ArrayList<Member>();
+            List<User> users = new ArrayList<>();
             for (Long id : request.getUserIds()) {
                 Member member = memberRepository.findByClubIdAndUserId(clubId, id);
                 if (member != null) {
-                    members.add(member);
+                    users.add(member.getUser());
                 }
             }
-            event.setMembers(members);
+            event.setUsers(users);
         }
     }
 }

@@ -13,5 +13,8 @@ import java.util.Optional;
 public interface EventRepository extends JpaRepository<Event, Long> {
     Optional<Event> findByIdAndClubId(Long id, Long clubId);
 
-
+    @Query(value = "SELECT e FROM Event e " +
+            "WHERE (:name IS NULL OR :name = '' OR (e.name LIKE CONCAT('%', :name, '%'))) " +
+            "AND e.club.id = :clubId ")
+    Page<Event> searchEventClub(String name, Long clubId, Pageable pageable);
 }

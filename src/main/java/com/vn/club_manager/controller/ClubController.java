@@ -1,8 +1,6 @@
 package com.vn.club_manager.controller;
 
-import com.vn.club_manager.model.BoardDto;
-import com.vn.club_manager.model.ClubDto;
-import com.vn.club_manager.model.PageDto;
+import com.vn.club_manager.model.*;
 import com.vn.club_manager.model.request.AddMemberRequest;
 import com.vn.club_manager.model.request.BoardRequest;
 import com.vn.club_manager.model.request.ClubRequest;
@@ -63,10 +61,36 @@ public class ClubController {
         return ResponseEntity.ok(club);
     }
 
-    @PostMapping("{id}/add-member")
+    @DeleteMapping("{id}")
+    private ResponseEntity<?> deleteClub(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        clubService.delete(id);
+        return ResponseEntity.ok("Delete member successfully");
+    }
+
+    @GetMapping("{id}/members")
+    private ResponseEntity<PageDto<MemberDto>> getMembers(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "") String name,
+            @RequestParam(value = "pageIndex", defaultValue = "1") int pageIndex,
+            @RequestParam(value = "pageSize", defaultValue = "20") int pageSize,
+            @RequestParam(value = "key", required = false) String key,
+            @RequestParam(value = "orderBy", required = false) String orderBy
+    ) {
+        Pageable pageable = pageUtil.getPageable(pageIndex, pageSize, key, orderBy);
+        PageDto<MemberDto> members =  memberService.getMembers(id, name, pageable);
+        return ResponseEntity.ok(members);
+    }
+
+    @PostMapping("{id}/members")
     private ResponseEntity<?> addMember(@PathVariable Long id, @RequestBody AddMemberRequest request) {
         memberService.AddMember(id, request);
         return ResponseEntity.ok("Add member successfully");
+    }
+
+    @DeleteMapping("{id}/members/{memId}")
+    private ResponseEntity<?> deleteMember(@PathVariable Long id, @PathVariable Long memId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        memberService.deleteMember(id, memId, userDetails.getId());
+        return ResponseEntity.ok("Delete member successfully");
     }
 
     @PostMapping("{id}/set-president")
@@ -87,10 +111,36 @@ public class ClubController {
         return ResponseEntity.ok("Create board successfully");
     }
 
+    @PutMapping("{id}/boards/{boardId}")
+    private ResponseEntity<?> updateBoard(@PathVariable Long id, @PathVariable Long boardId, @RequestBody BoardRequest request, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        boardService.update(id, boardId, request, userDetails.getId());
+        return ResponseEntity.ok("Update board successfully");
+    }
+
     @DeleteMapping("{id}/boards/{boardId}")
-    private ResponseEntity<?> deleteBoard(@PathVariable Long id, @PathVariable Long boardId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    private ResponseEntity<?> deleteBoard(@PathVariable(name = "id") Long id, @PathVariable(name = "boardId") Long boardId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         boardService.delete(id, boardId, userDetails.getId());
         return ResponseEntity.ok("Delete board successfully");
+    }
+
+    @GetMapping("{id}/events")
+    private ResponseEntity<PageDto<EventDto>> getEvents(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "") String name,
+            @RequestParam(value = "pageIndex", defaultValue = "1") int pageIndex,
+            @RequestParam(value = "pageSize", defaultValue = "20") int pageSize,
+            @RequestParam(value = "key", required = false, defaultValue = "eventDate") String key,
+            @RequestParam(value = "orderBy", required = false, defaultValue = "asc") String orderBy
+    ) {
+        Pageable pageable = pageUtil.getPageable(pageIndex, pageSize, key, orderBy);
+        PageDto<EventDto> events = eventService.searchEventsClub(name, id, pageable);
+        return ResponseEntity.ok(events);
+    }
+
+    @GetMapping("{id}/events/{eventId}")
+    private ResponseEntity<EventDto> getEvent(@PathVariable Long id, @PathVariable Long eventId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        EventDto event = eventService.getEventById(eventId, userDetails.getId());
+        return ResponseEntity.ok(event);
     }
 
     @PostMapping("{id}/events")
@@ -105,7 +155,7 @@ public class ClubController {
         return ResponseEntity.ok("Update event successfully");
     }
 
-    @DeleteMapping("{id}/boards/{eventId}")
+    @DeleteMapping("{id}/events/{eventId}")
     private ResponseEntity<?> deleteEvent(@PathVariable Long id, @PathVariable Long eventId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         eventService.delete(eventId, id, userDetails.getId());
         return ResponseEntity.ok("Delete event successfully");

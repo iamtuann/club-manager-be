@@ -6,7 +6,9 @@ import com.vn.club_manager.model.request.EventRequest;
 import org.springframework.data.domain.Pageable;
 
 public interface EventService {
-    PageDto<EventDto> searchEvents(String name, Long clubId, Pageable pageable);
+    PageDto<EventDto> searchEventsClub(String name, Long clubId, Pageable pageable);
+
+    EventDto getEventById(Long id, Long userId);
 
     void create(Long clubId, EventRequest request, Long userId);
 

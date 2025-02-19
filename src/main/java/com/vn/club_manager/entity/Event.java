@@ -48,9 +48,9 @@ public class Event {
     @JoinTable(
             name = "event_member",
             joinColumns = @JoinColumn(name = "event_id"),
-            inverseJoinColumns = @JoinColumn(name = "member_id")
+            inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<Member> members;
+    private List<User> users;
 
     @PrePersist
     public void prePersist() {

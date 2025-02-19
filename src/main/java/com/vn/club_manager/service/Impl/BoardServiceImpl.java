@@ -38,6 +38,18 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
+    public void update(Long clubId, Long boardId, BoardRequest request, Long userId) {
+        if (!authUserService.hasClubManagementRights(userId, clubId)) {
+            throw new NoPermissionException("create board");
+        }
+        Board board = boardRepository.findByIdAndClubId(boardId, clubId)
+                .orElseThrow(() -> new ResourceNotFoundException("Board", "id", boardId));
+        board.setName(request.getName());
+        board.setDescription(request.getDescription());
+        boardRepository.save(board);
+    }
+
+    @Override
     public List<BoardDto> findBoardsByClubId(Long clubId) {
         clubRepository.findById(clubId)
                 .orElseThrow(() -> new ResourceNotFoundException("Club", "id", clubId));

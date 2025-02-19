@@ -2,6 +2,7 @@ package com.vn.club_manager.service;
 
 import com.vn.club_manager.model.BoardDto;
 import com.vn.club_manager.model.ClubDto;
+import com.vn.club_manager.model.MemberDto;
 import com.vn.club_manager.model.PageDto;
 import com.vn.club_manager.model.request.BoardRequest;
 import com.vn.club_manager.model.request.ClubRequest;
@@ -21,5 +22,5 @@ public interface ClubService {
 
     void setPresident(long id, Long userId);
 
-    void delete(long id, long userId);
+    void delete(long id);
 }

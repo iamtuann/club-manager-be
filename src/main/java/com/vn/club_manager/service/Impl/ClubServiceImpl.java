@@ -1,11 +1,13 @@
 package com.vn.club_manager.service.Impl;
 
 import com.vn.club_manager.entity.Club;
+import com.vn.club_manager.entity.Member;
 import com.vn.club_manager.entity.User;
 import com.vn.club_manager.enums.EStatus;
 import com.vn.club_manager.exception.APIException;
 import com.vn.club_manager.exception.ResourceNotFoundException;
 import com.vn.club_manager.model.ClubDto;
+import com.vn.club_manager.model.MemberDto;
 import com.vn.club_manager.model.PageDto;
 import com.vn.club_manager.model.request.ClubRequest;
 import com.vn.club_manager.repository.AuthUserRepository;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -73,8 +76,14 @@ public class ClubServiceImpl implements ClubService {
     }
 
     @Override
-    public void delete(long id, long userId) {
-
+    public void delete(long id) {
+        Club club = clubRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Club", "id", id));
+        club.setManager(null);
+        club.setStatus(EStatus.INACTIVE.getValue());
+        club.setMembers(null);
+        club.setDissolvedAt(new Date());
+        clubRepository.save(club);
     }
 
     public void UpdateClubFromRequest(ClubRequest request, Club club) {

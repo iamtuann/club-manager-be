@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository(value = "authUserRepository")
@@ -21,4 +22,8 @@ public interface AuthUserRepository extends JpaRepository<User, Long> {
     User findAuthUserById(long id);
 
     boolean existsByUsername(String username);
+
+    @Query("SELECT u FROM User u LEFT JOIN Member cm ON u.id = cm.user.id " +
+            "AND cm.club.id = :clubId WHERE cm.id IS NULL")
+    List<User> findUsersNotInClub(@Param("clubId") Long clubId);
 }
