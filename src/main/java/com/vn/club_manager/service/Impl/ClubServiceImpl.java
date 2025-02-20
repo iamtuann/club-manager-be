@@ -1,13 +1,11 @@
 package com.vn.club_manager.service.Impl;
 
 import com.vn.club_manager.entity.Club;
-import com.vn.club_manager.entity.Member;
 import com.vn.club_manager.entity.User;
 import com.vn.club_manager.enums.EStatus;
 import com.vn.club_manager.exception.APIException;
 import com.vn.club_manager.exception.ResourceNotFoundException;
 import com.vn.club_manager.model.ClubDto;
-import com.vn.club_manager.model.MemberDto;
 import com.vn.club_manager.model.PageDto;
 import com.vn.club_manager.model.request.ClubRequest;
 import com.vn.club_manager.repository.AuthUserRepository;
@@ -98,6 +96,10 @@ public class ClubServiceImpl implements ClubService {
         }
         if ( request.getStatus() != null ) {
             club.setStatus( request.getStatus() );
+        }
+        if (request.getUserId() != null ) {
+            memberRepository.findByClubIdAndUserId(club.getId(), request.getUserId())
+                    .ifPresent(member -> club.setManager(member.getUser()));
         }
     }
 }

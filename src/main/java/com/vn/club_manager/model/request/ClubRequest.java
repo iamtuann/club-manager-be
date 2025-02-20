@@ -15,4 +15,5 @@ public class ClubRequest {
     private String name;
     private String description;
     private Integer status;
+    private Long userId;
 }

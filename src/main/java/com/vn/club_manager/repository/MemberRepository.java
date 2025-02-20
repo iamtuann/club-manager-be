@@ -2,7 +2,6 @@ package com.vn.club_manager.repository;
 
 import com.vn.club_manager.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -11,7 +10,7 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long> {
     boolean existsByClubIdAndUserId(Long clubId, Long userId);
 
-    Member findByClubIdAndUserId(Long clubId, Long userId);
+    Optional<Member> findByClubIdAndUserId(Long clubId, Long userId);
 
     Optional<Member> findByIdAndClubId(Long id, Long clubId);
 }

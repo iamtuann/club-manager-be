@@ -17,4 +17,14 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "WHERE (:name IS NULL OR :name = '' OR (e.name LIKE CONCAT('%', :name, '%'))) " +
             "AND e.club.id = :clubId ")
     Page<Event> searchEventClub(String name, Long clubId, Pageable pageable);
+
+    @Query(value = "SELECT e FROM Event e " +
+            "WHERE (:name IS NULL OR :name = '' OR (e.name LIKE CONCAT('%', :name, '%'))) ")
+    Page<Event> searchEvents(String name, Pageable pageable);
+
+    @Query(value = "SELECT e FROM Event e " +
+            "WHERE (:name IS NULL OR :name = '' OR (e.name LIKE CONCAT('%', :name, '%'))) " +
+            "AND e.club.id IN " +
+            "(SELECT m.club.id FROM Member m WHERE m.user.id = :userId)")
+    Page<Event> searchEventsUser(String name, Long userId, Pageable pageable);
 }

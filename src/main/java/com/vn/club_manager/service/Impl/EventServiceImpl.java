@@ -6,6 +6,7 @@ import com.vn.club_manager.entity.Member;
 import com.vn.club_manager.entity.User;
 import com.vn.club_manager.exception.NoPermissionException;
 import com.vn.club_manager.exception.ResourceNotFoundException;
+import com.vn.club_manager.model.EventDetail;
 import com.vn.club_manager.model.EventDto;
 import com.vn.club_manager.model.PageDto;
 import com.vn.club_manager.model.request.EventRequest;
@@ -35,6 +36,19 @@ public class EventServiceImpl implements EventService {
         Page<Event> pages = eventRepository.searchEventClub(name, clubId, pageable);
         List<EventDto> events = pages.stream().map(EventDto::new).toList();
         return new PageDto<>(events, pages);
+    }
+
+    @Override
+    public PageDto<EventDetail> searchEvents(String name, Long userId, Pageable pageable) {
+        if (authUserService.isManager(userId)) {
+            Page<Event> pages = eventRepository.searchEvents(name, pageable);
+            List<EventDetail> events = pages.stream().map(EventDetail::new).toList();
+            return new PageDto<>(events, pages);
+        } else {
+            Page<Event> pages = eventRepository.searchEventsUser(name, userId, pageable);
+            List<EventDetail> events = pages.stream().map(EventDetail::new).toList();
+            return new PageDto<>(events, pages);
+        }
     }
 
     @Override
@@ -97,10 +111,7 @@ public class EventServiceImpl implements EventService {
         if (request.getUserIds() != null) {
             List<User> users = new ArrayList<>();
             for (Long id : request.getUserIds()) {
-                Member member = memberRepository.findByClubIdAndUserId(clubId, id);
-                if (member != null) {
-                    users.add(member.getUser());
-                }
+                memberRepository.findByClubIdAndUserId(clubId, id).ifPresent(member -> users.add(member.getUser()));
             }
             event.setUsers(users);
         }

@@ -1,7 +1,6 @@
 package com.vn.club_manager.model;
 
 import com.vn.club_manager.entity.Event;
-import com.vn.club_manager.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +13,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventDto {
+public class EventDetail {
     private Long id;
     private String name;
     private String description;
@@ -24,9 +23,9 @@ public class EventDto {
     private Long clubId;
     private String clubName;
     private Integer memberCount;
-    private List<Long> userIds;
+    private List<UserDto> users;
 
-    public EventDto(Event event) {
+    public EventDetail(Event event) {
         this.id = event.getId();
         this.name = event.getName();
         this.description = event.getDescription();
@@ -36,6 +35,6 @@ public class EventDto {
         this.clubId = event.getClub().getId();
         this.clubName = event.getClub().getName();
         this.memberCount = event.getUsers() != null ? event.getUsers().size() : 0;
-        this.userIds = event.getUsers().stream().map(User::getId).toList();
+        this.users = event.getUsers().stream().map(UserDto::new).toList();
     }
 }
