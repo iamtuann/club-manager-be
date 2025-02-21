@@ -52,6 +52,15 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public PageDto<EventDto> getEventsOfMember(Long memId, Pageable pageable) {
+        Member member = memberRepository.findById(memId)
+                .orElseThrow(() -> new ResourceNotFoundException("Member", "id", memId));
+        Page<Event> pages = eventRepository.getEventsOfMember(member.getId(), member.getClub().getId(), pageable);
+        List<EventDto> events = pages.stream().map(EventDto::new).toList();
+        return new PageDto<>(events, pages);
+    }
+
+    @Override
     public EventDto getEventById(Long id, Long userId) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Event", "id", id));

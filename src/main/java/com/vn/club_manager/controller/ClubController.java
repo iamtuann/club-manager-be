@@ -81,6 +81,16 @@ public class ClubController {
         return ResponseEntity.ok(members);
     }
 
+    @GetMapping("{id}/members/{memId}")
+    private ResponseEntity<MemberDto> getMember(
+            @PathVariable Long id,
+            @PathVariable Long memId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        MemberDto member = memberService.getMember(memId, id, userDetails.getId());
+        return ResponseEntity.ok(member);
+    }
+
     @PostMapping("{id}/members")
     private ResponseEntity<?> addMember(@PathVariable Long id, @RequestBody AddMemberRequest request) {
         memberService.AddMember(id, request);

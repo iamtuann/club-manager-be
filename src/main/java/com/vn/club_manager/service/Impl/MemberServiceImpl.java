@@ -39,6 +39,17 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public MemberDto getMember(Long memberId, Long clubId, Long userId) {
+        if (authUserService.hasClubManagementRights(userId, clubId)) {
+            Member member = memberRepository.findById(memberId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Member", "id", memberId));
+            return new MemberDto(member);
+        } else {
+            throw new NoPermissionException("get member info");
+        }
+    }
+
+    @Override
     public void AddMember(Long clubId, AddMemberRequest request) {
         Club club = clubRepository.findById(clubId)
                 .orElseThrow(() -> new ResourceNotFoundException("Club", "id", clubId));

@@ -27,4 +27,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "AND e.club.id IN " +
             "(SELECT m.club.id FROM Member m WHERE m.user.id = :userId)")
     Page<Event> searchEventsUser(String name, Long userId, Pageable pageable);
+
+    @Query(value = "SELECT e FROM Event e " +
+            "JOIN e.users u " +
+            "WHERE u.id = :userId " +
+            "AND e.club.id = :clubId ")
+    Page<Event> getEventsOfMember(Long userId, Long clubId, Pageable pageable);
 }

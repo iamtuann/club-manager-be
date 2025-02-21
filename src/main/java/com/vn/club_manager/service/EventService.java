@@ -11,6 +11,8 @@ public interface EventService {
 
     PageDto<EventDetail> searchEvents(String name, Long userId, Pageable pageable);
 
+    PageDto<EventDto> getEventsOfMember(Long memId, Pageable pageable);
+
     EventDto getEventById(Long id, Long userId);
 
     void create(Long clubId, EventRequest request, Long userId);
