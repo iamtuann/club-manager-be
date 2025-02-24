@@ -9,7 +9,9 @@ public interface ClubService {
 
     ClubDto findClubById(Long id);
 
-    PageDto<ClubDto> searchClubs(String name, Pageable pageable);
+    String getUserRoleInClub(Long clubId, Long userId);
+
+    PageDto<ClubDto> searchClubs(String name, Pageable pageable, Long userId);
 
     ClubDto create(ClubRequest request);
 

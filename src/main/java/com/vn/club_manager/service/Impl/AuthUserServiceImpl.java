@@ -44,7 +44,7 @@ public class AuthUserServiceImpl implements AuthUserService {
 
     @Override
     public boolean isClubManager(Long userId, Long clubId) {
-        return clubRepository.existsByIdAndManagerId(userId, clubId);
+        return clubRepository.existsByIdAndManagerId(clubId, userId);
     }
 
     @Override

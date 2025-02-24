@@ -1,6 +1,7 @@
 package com.vn.club_manager.service.Impl;
 
 import com.vn.club_manager.entity.Club;
+import com.vn.club_manager.entity.Member;
 import com.vn.club_manager.entity.User;
 import com.vn.club_manager.enums.EStatus;
 import com.vn.club_manager.exception.APIException;
@@ -36,10 +37,28 @@ public class ClubServiceImpl implements ClubService {
     }
 
     @Override
-    public PageDto<ClubDto> searchClubs(String name, Pageable pageable) {
-        Page<Club> pages = clubRepository.searchClubs(name, pageable);
-        List<ClubDto> clubs = pages.stream().map(ClubDto::new).toList();
-        return new PageDto<>(clubs, pages);
+    public String getUserRoleInClub(Long clubId, Long userId) {
+        Club club = clubRepository.findById(clubId)
+                .orElseThrow(() -> new ResourceNotFoundException("Club", "id", clubId));
+        if (club.getManager().getId().equals(userId)) {
+            return "MANAGER";
+        }
+        Member member = memberRepository.findByClubIdAndUserId(clubId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Member", "userId", userId));
+        return "MEMBER";
+    }
+
+    @Override
+    public PageDto<ClubDto> searchClubs(String name, Pageable pageable, Long userId) {
+        if (authUserRepository.isManager(userId)) {
+            Page<Club> pages = clubRepository.searchClubs(name, pageable);
+            List<ClubDto> clubs = pages.stream().map(ClubDto::new).toList();
+            return new PageDto<>(clubs, pages);
+        } else {
+            Page<Club> pages = clubRepository.searchClubsUser(name, userId, pageable);
+            List<ClubDto> clubs = pages.stream().map(ClubDto::new).toList();
+            return new PageDto<>(clubs, pages);
+        }
     }
 
     @Override

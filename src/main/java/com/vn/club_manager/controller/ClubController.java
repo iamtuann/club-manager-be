@@ -36,10 +36,11 @@ public class ClubController {
             @RequestParam(value = "pageIndex", defaultValue = "1") int pageIndex,
             @RequestParam(value = "pageSize", defaultValue = "20") int pageSize,
             @RequestParam(value = "key", required = false) String key,
-            @RequestParam(value = "orderBy", required = false) String orderBy
+            @RequestParam(value = "orderBy", required = false) String orderBy,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         Pageable pageable = pageUtil.getPageable(pageIndex, pageSize, key, orderBy);
-        PageDto<ClubDto> clubs = clubService.searchClubs(name, pageable);
+        PageDto<ClubDto> clubs = clubService.searchClubs(name, pageable, userDetails.getId());
         return ResponseEntity.ok(clubs);
     }
 
@@ -47,6 +48,12 @@ public class ClubController {
     private ResponseEntity<ClubDto> getClub(@PathVariable Long id) {
         ClubDto club = clubService.findClubById(id);
         return ResponseEntity.ok(club);
+    }
+
+    @GetMapping("{id}/role")
+    private ResponseEntity<String> getUserRole(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        String role = clubService.getUserRoleInClub(id, userDetails.getId());
+        return ResponseEntity.ok(role);
     }
 
     @PostMapping("")
