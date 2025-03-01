@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -43,9 +44,12 @@ public class ClubServiceImpl implements ClubService {
         if (club.getManager().getId().equals(userId)) {
             return "MANAGER";
         }
-        Member member = memberRepository.findByClubIdAndUserId(clubId, userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Member", "userId", userId));
-        return "MEMBER";
+        Optional<Member> member = memberRepository.findByClubIdAndUserId(clubId, userId);
+        if (member.isPresent()) {
+            return "MEMBER";
+        } else {
+            return "NONE";
+        }
     }
 
     @Override
