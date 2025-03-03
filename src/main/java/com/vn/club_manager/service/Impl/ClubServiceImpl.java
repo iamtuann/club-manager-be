@@ -41,7 +41,7 @@ public class ClubServiceImpl implements ClubService {
     public String getUserRoleInClub(Long clubId, Long userId) {
         Club club = clubRepository.findById(clubId)
                 .orElseThrow(() -> new ResourceNotFoundException("Club", "id", clubId));
-        if (club.getManager().getId().equals(userId)) {
+        if (club.getManager() != null && club.getManager().getId().equals(userId)) {
             return "MANAGER";
         }
         Optional<Member> member = memberRepository.findByClubIdAndUserId(clubId, userId);
